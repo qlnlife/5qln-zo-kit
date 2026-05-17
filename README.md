@@ -20,3 +20,4 @@ Open your Zo Terminal and run:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/
+```

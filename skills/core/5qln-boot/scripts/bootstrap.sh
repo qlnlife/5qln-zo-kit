@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 5QLN Boot — Bootstrap Script
-# Installs L0 (Codex), L1 (Kernel), L3 (Workspace), L4 (Skills), L5 (Runtime)
+# Installs L0 (Codex), L1 (Kernel), L3 (Workspace), L5 (Runtime)
 # Usage: bash bootstrap.sh [codex|kernel|workspace|runtime|all]
 set -euo pipefail
 
@@ -153,55 +153,8 @@ install_runtime() {
 }
 
 # ═══════════════════════════════════════════════════════════════
-
-
-
-# ═══════════════════════════════════════════════════════════════
-# L4: SKILLS
-# ═══════════════════════════════════════════════════════════════
-
-install_skills() {
-    log "Installing L4: Core skills"
-
-    local skills_src="$BOOT_DIR/../skills"
-
-    # Core skills (from kit download)
-    if [ -d "$skills_src/core" ]; then
-        log "  Core skills..."
-        for skill_dir in "$skills_src/core"/*/; do
-            local skill_name
-            skill_name=$(basename "$skill_dir")
-            local dst="$WORKSPACE_DIR/Skills/$skill_name"
-            mkdir -p "$dst"
-            if [ -f "$skill_dir/SKILL.md" ]; then
-                cp "$skill_dir/SKILL.md" "$dst/SKILL.md"
-                echo "    ✓ $skill_name"
-            fi
-        done
-    else
-        warn "  Core skills not found at $skills_src/core — skipping"
-    fi
-
-    # Journal phase skills
-    if [ -d "$skills_src/journal" ]; then
-        log "  Journal skills..."
-        mkdir -p "$WORKSPACE_DIR/5qln-journal/skills"
-        for skill_file in "$skills_src/journal"/*.md; do
-            local skill_name
-            skill_name=$(basename "$skill_file")
-            cp "$skill_file" "$WORKSPACE_DIR/5qln-journal/skills/$skill_name"
-            echo "    ✓ $skill_name"
-        done
-    else
-        warn "  Journal skills not found at $skills_src/journal — skipping"
-    fi
-
-    log "Skills installed"
-}
-
-# ═══════════════════════════════════════════════════════════════
 # L2: ZO CONFIGURATION (informational)
-# ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════
 
 show_zo_config() {
     echo ""
@@ -229,13 +182,12 @@ show_zo_config() {
 # ═══════════════════════════════════════════════════════════════
 
 usage() {
-    echo "Usage: bash bootstrap.sh [codex|kernel|workspace|skills|runtime|all|zo-config]"
+    echo "Usage: bash bootstrap.sh [codex|kernel|workspace|runtime|all|zo-config]"
     echo "  codex      Install L0 (Codex) only"
     echo "  kernel     Install L1 (Kernel) only"
     echo "  workspace  Install L3 (Workspace defaults)"
-    echo "  skills     Install L4 (Core skills) only"
     echo "  runtime    Install L5 (Runtime directories)"
-    echo "  all        Install L0+L1+L3+L4+L5 (complete filesystem setup)"
+    echo "  all        Install L0+L1+L3+L5 (filesystem components)"
     echo "  zo-config  Show L2 instructions (persona + rule)"
     echo ""
     echo "Workspace env vars:"
@@ -272,7 +224,6 @@ main() {
             local q="${FOUNDING_QUESTION:-}"
             install_workspace "$human" "$mode" "$q"
             install_runtime
-            install_skills
             show_zo_config
             ;;
         zo-config)
