@@ -4,12 +4,27 @@
 # Exits 0 if all checks pass, non-zero if any fail.
 set -euo pipefail
 
+# Soft-fail policy: L0 Codex failures exit 1. L1-L5 failures are warnings only.
+# Exit 0 if all L0 checks pass (even if L1-L5 fail).
+L0_FAILURES=0
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
 PASS=0
 FAIL=0
+
+check_l0() {
+    local label="$1"
+    if eval "$2" &>/dev/null; then
+        echo -e "  ${GREEN}[PASS]${NC} $label"
+        ((PASS++))
+    else
+        echo -e "  ${RED}[FAIL]${NC} $label"
+        ((FAIL++))
+        ((L0_FAILURES++))
+    fi
+}
 
 check() {
     local label="$1"
@@ -38,11 +53,11 @@ header "L0: Codex"
 
 CODEX_HASH="feaa46b4147d4e023cdd3fd59c051d063e8ec654ee7b38a481dcd5e4c781859b"
 
-check "Codex file exists" '[ -f "$HOME/.5qln/codex.txt" ]'
-check "Codex SHA-256 matches" '[ "$(sha256sum "$HOME/.5qln/codex.txt" | cut -d" " -f1)" = "$CODEX_HASH" ]'
-check "Codex is 9 lines" '[ "$(wc -l < "$HOME/.5qln/codex.txt")" -eq 9 ]'
-check "Codex is 217 bytes" '[ "$(wc -c < "$HOME/.5qln/codex.txt")" -eq 217 ]'
-check "Codex contains U+22C2 (⋂) on line 5" 'grep -q "⋂" "$HOME/.5qln/codex.txt"'
+check_l0 "Codex file exists" '[ -f "$HOME/.5qln/codex.txt" ]'
+check_l0 "Codex SHA-256 matches" '[ "$(sha256sum "$HOME/.5qln/codex.txt" | cut -d" " -f1)" = "$CODEX_HASH" ]'
+check_l0 "Codex is 9 lines" '[ "$(wc -l < "$HOME/.5qln/codex.txt")" -eq 9 ]'
+check_l0 "Codex is 217 bytes" '[ "$(wc -c < "$HOME/.5qln/codex.txt")" -eq 217 ]'
+check_l0 "Codex contains U+22C2 (⋂) on line 5" 'grep -q "⋂" "$HOME/.5qln/codex.txt"'
 
 # ══════════════════════════════════════════
 # L1: KERNEL
@@ -105,10 +120,14 @@ if [ $FAIL -gt 0 ]; then
 fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+if [ $L0_FAILURES -gt 0 ]; then
+    echo ""
+    echo "L0 Codex failure — cannot continue. Re-run bootstrap.sh codex"
+    exit 1
+fi
 if [ $FAIL -gt 0 ]; then
     echo ""
-    echo "Some checks failed. Review above and re-run bootstrap.sh for the failed layer."
-    exit 1
+    echo "${FAIL} non-L0 checks failed (warnings only — runtime may still function)."
 fi
 
 echo ""

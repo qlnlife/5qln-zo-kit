@@ -173,8 +173,9 @@ install_skills() {
             skill_name=$(basename "$skill_dir")
             local dst="$WORKSPACE_DIR/Skills/$skill_name"
             mkdir -p "$dst"
-            if [ -f "$skill_dir/SKILL.md" ]; then
-                cp "$skill_dir/SKILL.md" "$dst/SKILL.md"
+            if [ -d "$skill_dir" ]; then
+                # Copy FULL skill directory — scripts, references, assets
+                cp -r "$skill_dir"* "$dst"/
                 echo "    ✓ $skill_name"
             fi
         done

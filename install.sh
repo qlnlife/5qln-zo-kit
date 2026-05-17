@@ -20,43 +20,47 @@ echo "║  5QLN for Zo Computer — Installer       ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
 
-# Step 1: Download the kit
+# Step 1: Clone the repo (gets full directory structure)
 echo "[1/4] Downloading kit from GitHub..."
 rm -rf "$KIT_DIR"
-mkdir -p "$KIT_DIR/boot/scripts" "$KIT_DIR/boot/assets" "$KIT_DIR/boot/references"
-mkdir -p "$KIT_DIR/skills/core" "$KIT_DIR/skills/journal"
+git clone -q --depth 1 https://github.com/qlnlife/5qln-zo-kit.git "$KIT_DIR" 2>/dev/null && echo "  ✓ Full kit cloned" || {
+    echo "  ⚠ git clone failed, trying sparse curl download..."
+    # Fallback: manually download essential files
+    mkdir -p "$KIT_DIR"/{boot/{scripts,assets,references},skills/{core,journal}}
 
-download_file() {
-    local src="$1" dst="$2"
-    if curl -fsSL "$src" -o "$dst" 2>/dev/null; then
-        echo "  ✓ $dst"
-    else
-        echo "  ⚠ $dst (skipped — may be optional)"
-    fi
+    download_file() {
+        local src="$1" dst="$2"
+        if curl -fsSL "$src" -o "$dst" 2>/dev/null; then
+            return 0
+        else
+            echo "  ⚠ $dst (skipped)"
+            return 1
+        fi
+    }
+
+    # Boot files
+    for f in SKILL.md scripts/bootstrap.sh scripts/verify-all.sh \
+             assets/codex.txt assets/init.py \
+             assets/AGENTS.md.template assets/SOUL.md.template \
+             assets/persona-prompt.md references/ARCHITECTURE.md; do
+        download_file "$REPO_RAW/boot/$f" "$KIT_DIR/boot/$f"
+    done
+    chmod +x "$KIT_DIR/boot/scripts/bootstrap.sh" "$KIT_DIR/boot/scripts/verify-all.sh" 2>/dev/null || true
+
+    # Core skills — download SKILL.md for each
+    for skill in 5qln-orchestrate 5qln-open-template-stack 5qln-corruption-codex \
+                 5qln-membrane-protocol-runtime 5qln-project-space 5qln-alpha-library \
+                 5qln-skill-evolve 5qln-skill-refine 5qln-research \
+                 5qln-selfimprove 5qln-skillgen; do
+        mkdir -p "$KIT_DIR/skills/core/$skill"
+        download_file "$REPO_RAW/skills/core/$skill/SKILL.md" "$KIT_DIR/skills/core/$skill/SKILL.md"
+    done
+
+    # Journal skills
+    for skill in S-skill G-skill Q-skill P-skill V-skill; do
+        download_file "$REPO_RAW/skills/journal/$skill.md" "$KIT_DIR/skills/journal/$skill.md"
+    done
 }
-
-# Boot skill files
-for f in SKILL.md scripts/bootstrap.sh scripts/verify-all.sh \
-         assets/codex.txt assets/init.py \
-         assets/AGENTS.md.template assets/SOUL.md.template \
-         assets/persona-prompt.md references/ARCHITECTURE.md; do
-    download_file "$REPO_RAW/boot/$f" "$KIT_DIR/boot/$f"
-done
-chmod +x "$KIT_DIR/boot/scripts/bootstrap.sh" "$KIT_DIR/boot/scripts/verify-all.sh" 2>/dev/null || true
-
-# Core skills
-for skill in 5qln-orchestrate 5qln-open-template-stack 5qln-corruption-codex \
-             5qln-membrane-protocol-runtime 5qln-project-space 5qln-alpha-library \
-             5qln-skill-evolve 5qln-skill-refine 5qln-commercialize 5qln-research \
-             5qln-selfimprove 5qln-skillgen; do
-    mkdir -p "$KIT_DIR/skills/core/$skill"
-    download_file "$REPO_RAW/skills/core/$skill/SKILL.md" "$KIT_DIR/skills/core/$skill/SKILL.md"
-done
-
-# Journal skills
-for skill in S-skill G-skill Q-skill P-skill V-skill; do
-    download_file "$REPO_RAW/skills/journal/$skill.md" "$KIT_DIR/skills/journal/$skill.md"
-done
 
 # Step 2: Run bootstrap
 echo ""
