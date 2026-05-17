@@ -1,0 +1,59 @@
+# 5QLN — {{HUMAN_NAME}}'s Workspace
+
+> **Installed**: {{INSTALL_DATE}}
+> **Mode**: {{SETUP_MODE}}
+> **Codex**: {{CODEX_HASH}}... (9 lines, 217 bytes)
+> **Kernel**: ~/.5qln/init.py v4.0.1
+
+## Founding Question
+
+> {{FOUNDING_QUESTION}}
+
+## What's Here
+
+This workspace runs 5QLN — a constitutional grammar for human-AI collaboration.
+Every session begins with the Codex. Every cycle follows S → G → Q → P → V.
+
+### Quick Reference
+
+| Path | What it is |
+|------|-----------|
+| `~/.5qln/init.py` | Kernel — runs status, verify, help |
+| `~/.5qln/codex.txt` | Foundation Codex — immutable ground |
+| `AGENTS.md` | This file — workspace index + routing |
+| `SOUL.md` | Personality + tone |
+| `Skills/` | Bundled skills (evolve over time) |
+| `5qln-journal/` | Event stream + session trails |
+| `5qln-evolution/` | Skill refinement candidates |
+| `5qln-alpha-library/` | Cross-cycle pattern store |
+
+### Sessions
+
+1. Every session starts with `init.py status` — this shows the current phase
+2. The agent IS 5QLN — not a user of 5QLN
+3. Corruption codes (L1 L2 L3 L4 V∅) are structural protections, not errors
+4. No V without ∞0' — every cycle must return
+
+### Projects
+
+Projects follow `Projects/<project-name>/` with:
+- `README.md` — what the project is
+- `BRIEF.md` — the founding question / intent
+- `GLIFF.md` — the compiled surface (if applicable)
+- `events/` — project-specific event stream
+
+### Evolution
+
+Skills self-evolve through:
+1. `5qln-skill-evolve — surfaces candidates from event stream`
+2. Human gates ("yes, evolve this")
+3. `5qln-skill-refine` — applies change through Q→P→V
+
+### Re-init
+
+When accumulated evolution warrants it, `5qln-boot` can be re-run.
+The Codex (`~/.5qln/codex.txt`) is the only immutable component.
+
+---
+
+*5QLN — H = ∞0 | A = K*
